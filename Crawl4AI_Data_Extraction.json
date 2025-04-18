@@ -101,7 +101,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=角色设定：\n你是一名信息结构化和知识库开发的专家，请检修持有专业态度，你的任务是将 markdown 数据整理为适合 LLM 驱动的 RAG 知识库的结构化、易读格式。\n\n任务要求：\n1. 内容解析\n- 识别 markdown 数据中的关键内容和主要结构。\n\n2. 结构化整理\n- 以清晰的层级关系和分层逻辑组织信息，使其易于检索和理解。\n- 保留所有可能对回答用户查询有价值的细节。\n\n3. 创建 FAQ（如适用）\n- 根据内容提炼出常见问题，并提供清晰、直接的解答。\n\n4. 提升可读性\n- 采用项目符号、编号列表、段落分隔等特式优化排版，使内容更直观。\n\n5. 优化输出\n- 严格去除 AI 生成的冗加说明，仅保留清理后的核心数据。\n\n调优规则：\n1. 完整性：确保所有相关信息完整保留，避免丢失对理解和理解有价值的内容。\n2. 精准性：FAQ 需要密切结合内容，确保清晰，满足且符合用户需求。\n3. 结构化：确保最终输出便于分析存储、同质化处理，并支持高效检索。\n\n数据输入：\n<markdown>{{ $json.result.markdown }}</markdown>\n",
+        "text": "=角色设定：\n你是一名信息结构化和知识库开发的专家，请检修持有专业态度，你的任务是将 markdown 数据整理为适合 LLM 驱动的 RAG 知识库的结构化、易读格式。\n\n任务要求：\n1. 内容解析\n- 识别 markdown 数据中的关键内容和主要结构。\n\n2. 结构化整理\n- 以清晰的层级关系和分层逻辑组织信息，使其易于检索和理解。\n- 保留所有可能对回答用户查询有价值的细节。\n\n3. 创建 FAQ（如适用）\n- 根据内容提炙出常见问题，并提供清晰、直接的解答。\n\n4. 提升可读性\n- 采用项目符号、编号列表、段落分隔等特式优化排版，使内容更直观。\n\n5. 优化输出\n- 严格去除 AI 生成的冗加说明，仅保留清理后的核心数据。\n\n调优规则：\n1. 完整性：确保所有相关信息完整保留，避免丢失对理解和理解有价值的内容。\n2. 精准性：FAQ 需要密切结合内容，确保清晰，满足且符合用户需求。\n3. 结构化：确保最终输出便于分析存储、同质化处理，并支持高效检索。\n\n数据输入：\n<markdown>{{ $json.result.markdown }}</markdown>\n",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -249,85 +249,155 @@
         -120
       ],
       "typeVersion": 1,
-      "id": "6ae616c3-f08c-4fc2-9c83-861f111df4fb",
+      "id": "da77e0a5-2a1a-4c35-8e08-3fb9abd6a4ec",
       "name": "Sticky Note1"
     },
     {
       "parameters": {
-        "content": "解析markdown 错误处理 持久化\n",
-        "height": 800,
-        "width": 1680,
+        "content": "智能整理 Markdown",
+        "height": 540,
+        "width": 940,
         "color": 4
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        380,
-        -200
+        920,
+        -120
       ],
       "typeVersion": 1,
-      "id": "539160ce-60d4-4a26-909f-2b5df2bc9d91",
+      "id": "47b6ecb3-a71e-4ea6-83f5-26cad9bba95c",
       "name": "Sticky Note2"
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "http://host.docker.internal:11235/crawl",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendBody": true,
-        "bodyParameters": {
+        "url": "http://127.0.0.1:8090/api/crawl/",
+        "sendQuery": true,
+        "queryParameters": {
           "parameters": [
             {
-              "name": "urls",
+              "name": "url",
               "value": "={{ $json.loc }}"
-            },
-            {
-              "name": "priority",
-              "value": "10"
             }
           ]
         },
         "options": {}
       },
+      "name": "post crawl",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        260,
-        200
+        -100,
+        380
       ],
-      "id": "c41de037-acbc-4dca-8dbf-1f0b1accc5b1",
-      "name": "post crawl",
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "VJic2ll6n930Aw5a",
-          "name": "Header Auth account"
-        }
-      }
+      "id": "a3cd96b2-9c29-45f4-86f3-73c9cf8f40ca"
     },
     {
       "parameters": {
-        "url": "=http://host.docker.internal:11235/task/{{ $json.task_id }}",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
+        "url": "http://127.0.0.1:8090/api/status",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "task_id",
+              "value": "={{ $json.task_id }}"
+            }
+          ]
+        },
         "options": {}
       },
+      "name": "get crawl status",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        700,
-        100
+        240,
+        380
       ],
-      "id": "366f37cb-5d3d-4ddb-8e7a-dc810169a315",
-      "name": "get crawl task",
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "VJic2ll6n930Aw5a",
-          "name": "Header Auth account"
-        }
-      }
+      "id": "85a2f5a4-4ad9-4a95-aedf-de34eef76201"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e6fd3ee0-6c42-4b39-b15e-ed36c3a36289",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "error",
+              "operator": {
+                "type": "string",
+                "operation": "notContains",
+                "name": "filter.operator.notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        460,
+        380
+      ],
+      "id": "9c81d76a-c15b-493c-8a2a-2ab7b7b4de22"
+    },
+    {
+      "parameters": {
+        "amount": 10,
+        "unit": "seconds"
+      },
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        660,
+        420
+      ],
+      "webhookId": "4e5a1b7c-8f7c-4d9d-8dd7-67c608e1fe35",
+      "id": "52e3f125-ca7c-4e73-95a8-09a0efcc3f31"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3d97e446-45bd-4ac4-a8a0-1d8a22bd20d9",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "If2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        200
+      ],
+      "id": "51dd0f9c-0eb9-46a2-a64c-f21f9c3e9d27"
     }
   ],
-  "pinData": {},
   "connections": {
     "When chat message received": {
       "main": [
@@ -386,21 +456,27 @@
     },
     "Loop Over Items": {
       "main": [
-        [],
         [
           {
-            "node": "post crawl",
+            "node": "Wait",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Wait": {
+    "If": {
       "main": [
         [
           {
-            "node": "get crawl task",
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
             "type": "main",
             "index": 0
           }
@@ -429,35 +505,6 @@
         ]
       ]
     },
-    "If": {
-      "main": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Edit Fields",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Edit Fields": {
-      "main": [
-        [
-          {
-            "node": "Wait",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Convert to File": {
       "main": [
         [
@@ -473,19 +520,54 @@
       "main": [
         [
           {
-            "node": "Loop Over Items",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Wait",
+            "node": "get crawl status",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "get crawl task": {
+    "get crawl status": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "get crawl status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
       "main": [
         [
           {
@@ -493,19 +575,35 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "post crawl",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     }
   },
-  "active": false,
+  "pinData": {},
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "5afd1e16-d1b5-4483-8b20-4ad896cbaef8",
-  "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "bced8aabd457420111ac7cf217fe3f2f73e96386ff4563bb7e97d32d55b5a78c"
-  },
-  "id": "VWwSBJIdBSpJK4df",
-  "tags": []
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-04-07T02:45:46.000Z",
+  "versionId": "e5baada2-bbe3-4d56-b2a3-9eba42805aa2"
 }
