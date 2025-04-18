@@ -1,0 +1,331 @@
+{
+  "name": "News Data Push",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            },
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        40,
+        180
+      ],
+      "id": "6a655106-5a5e-4af4-9b17-e8252edd5bf0",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://newsapi.org/v2/everything?q=ai&lang=en&apiKey=4660cd83bb604d27ae80f5a4d6092dcc",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        360,
+        280
+      ],
+      "id": "708520cf-f787-49ae-9c8d-79a87efd0b83",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "https://gnews.io/api/v4/search?q=ai&lang=en&apikey=922c6b36a29cd3a56d3297e0c91c4320",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        360,
+        60
+      ],
+      "id": "7434ca80-90f6-4942-b7e1-3435dd9e8a8a",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "332a5cfd-7de9-4863-bdb5-c281c00ea893",
+              "name": "articles",
+              "value": "={{ $json.articles }}",
+              "type": "string"
+            },
+            {
+              "id": "d09e637e-edff-4aed-90db-0d86ae2ecadd",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        580,
+        60
+      ],
+      "id": "2746fe48-fade-4d63-86cf-3de6458b7010",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2f92bd9a-e672-4a24-86f4-fa5eb0d612b9",
+              "name": "articles",
+              "value": "={{ $json.articles }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        580,
+        280
+      ],
+      "id": "385a97d9-ed5b-413a-9d3b-1cffe196029f",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        880,
+        160
+      ],
+      "id": "2af0c160-0e61-4629-865c-865d0a09b8c7",
+      "name": "Merge",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "=1361697251457630269",
+          "mode": "id"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1361697251457630275",
+          "mode": "list",
+          "cachedResultName": "综合",
+          "cachedResultUrl": "https://discord.com/channels/1361697251457630269/1361697251457630275"
+        },
+        "content": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1660,
+        160
+      ],
+      "id": "e6a91ad5-8c7c-4332-a6ae-e235940910f9",
+      "name": "Discord",
+      "webhookId": "5f196735-6e33-4bc6-8322-cbdf374abcde",
+      "credentials": {
+        "discordBotApi": {
+          "id": "th4Urmf7fCcGMQMb",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=角色定义：你是一位专业的AI新闻编辑，直接输出高质量的新闻内容。\n\n直接输出格式：\n\n早上好，今天是[当前日期]，以下是最新的AI行业动态：\n\n[按照以下格式直接输出15条以内的AI新闻]\n\n📌 [序号]. [标题]\n[原文链接][URL]\n[简明扼要的中文描述，保留必要的英文专业术语]\n\n格式要求：\n1. 从{{ $json.articles }}中筛选5条AI技术进展和应用相关新闻\n2. 保留英文专业术语(如Neural Networks、Transformer等)\n3. 每条新闻必须包含原始URL\n4. 使用清晰的排版和适当的表情符号\n5. 确保内容简洁易读\n6. 不显示思考过程也不输出思考过程\n7. 不显示图片\n示例格式：\n📌 1. AI突破：新型Transformer架构提升文本理解能力\n[原文链接][URL]\n研究人员开发了一种改进版的 Transformer 结构，相比传统模型，在文本分类和模型生成方面提升了20%的准确率......\n\n📌 2. OpenAI 发布 GPT-5，参数达 2 万亿\n[原文链接][URL]\n最新的 GPT-5 具备更强的推理能力，能够更自然地处理多轮对话，并支持实时转译......\n\n/end",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        1080,
+        160
+      ],
+      "id": "c1241ba6-f0f3-46b5-95b1-edec2f68dbf0",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "deepseek-r1:8b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        380
+      ],
+      "id": "f62f5696-c3ad-4169-b9ea-1384002e7e9c",
+      "name": "Ollama Chat Model2",
+      "credentials": {
+        "ollamaApi": {
+          "id": "jWG9wJuIWhUR3Vpe",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\n// 在Code节点中使用这段代码：\nconst content = items[0].json.output;\n// 使用正则表达式移除<think>标签及其内容\nconst cleanContent = content.replace(/<think>[\\s\\S]*?<\\/think>/g, '');\n\nreturn {\n  json: {\n    output: cleanContent\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        160
+      ],
+      "id": "ead6f95b-526f-4fb0-b360-c8ea7c332142",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "height": 500,
+        "width": 1880
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "19cf2e0c-fb12-4fbb-8837-819acaf655a9",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c7718e6c-1148-4d14-a27c-3f0e15158d15",
+  "meta": {
+    "instanceId": "bced8aabd457420111ac7cf217fe3f2f73e96386ff4563bb7e97d32d55b5a78c"
+  },
+  "id": "H0wDmPkTBnu4Zak0",
+  "tags": []
+}

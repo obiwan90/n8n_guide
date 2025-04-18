@@ -1,0 +1,171 @@
+{
+  "name": "RAG-UpLoad",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Upload Files",
+        "formDescription": "Upload Files",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Files",
+              "fieldType": "file",
+              "acceptFileTypes": ".pdf,.md,.csv"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5a201b88-9c78-4139-83cc-b202cfa1932b",
+      "name": "On form submission",
+      "webhookId": "0b855ef5-4294-4073-947a-0c2902e0d974"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "n8n-ollama-1024",
+          "mode": "list",
+          "cachedResultName": "n8n-ollama-1024"
+        },
+        "options": {
+          "pineconeNamespace": "Vue"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.1,
+      "position": [
+        220,
+        0
+      ],
+      "id": "760809df-bb48-43dc-b5e2-526ff582fd81",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "EoLZSwJAV1BLTpDB",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "mxbai-embed-large-2k:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        140,
+        200
+      ],
+      "id": "d4cd39bc-a10b-478b-a3f3-0ebd45c3cccd",
+      "name": "Embeddings Ollama",
+      "credentials": {
+        "ollamaApi": {
+          "id": "jWG9wJuIWhUR3Vpe",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "file",
+                "value": "={{ $json.Files[0].filename }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        300,
+        200
+      ],
+      "id": "4f93a7c7-b283-4594-bb5e-aed257e82784",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkSize": 500
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        200,
+        380
+      ],
+      "id": "c567722b-089a-4705-98af-642a4b8dc355",
+      "name": "Character Text Splitter"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1c7094e6-d805-4ed8-a797-e080031fa5b1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bced8aabd457420111ac7cf217fe3f2f73e96386ff4563bb7e97d32d55b5a78c"
+  },
+  "id": "6Kbzqj3rt2rceM2k",
+  "tags": []
+}

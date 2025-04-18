@@ -1,0 +1,511 @@
+{
+  "name": "Crawl4AI Data Extraction",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1060,
+        200
+      ],
+      "id": "ded621c5-4809-401c-98f9-9ebca64ac750",
+      "name": "When chat message received",
+      "webhookId": "b296d431-991e-4ecf-ada1-56015fbc3142"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.chatInput }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -840,
+        200
+      ],
+      "id": "5d499811-d40c-4236-8401-93902271f0eb",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "dataPropertyName": "=data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        -620,
+        200
+      ],
+      "id": "a0cd6a21-f8dc-480d-aff7-8cb3fd102c7d",
+      "name": "XML"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "urlset.url",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        200
+      ],
+      "id": "ff999db2-637b-4145-8bb4-06163ae1d695",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "maxItems": 10
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -180,
+        200
+      ],
+      "id": "a5f49e9f-a32e-4de5-9019-f96f54d1cf4f",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "batchSize": 2,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        40,
+        200
+      ],
+      "id": "36d63986-2930-415c-babd-0f88a9b45042",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "amount": 7
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        480,
+        200
+      ],
+      "id": "ba05923b-1b3e-40e8-828a-52ea085d5d86",
+      "name": "Wait",
+      "webhookId": "e86584f1-d4c2-4496-bc31-0ba1b42fb2cb"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=角色设定：\n你是一名信息结构化和知识库开发的专家，请检修持有专业态度，你的任务是将 markdown 数据整理为适合 LLM 驱动的 RAG 知识库的结构化、易读格式。\n\n任务要求：\n1. 内容解析\n- 识别 markdown 数据中的关键内容和主要结构。\n\n2. 结构化整理\n- 以清晰的层级关系和分层逻辑组织信息，使其易于检索和理解。\n- 保留所有可能对回答用户查询有价值的细节。\n\n3. 创建 FAQ（如适用）\n- 根据内容提炼出常见问题，并提供清晰、直接的解答。\n\n4. 提升可读性\n- 采用项目符号、编号列表、段落分隔等特式优化排版，使内容更直观。\n\n5. 优化输出\n- 严格去除 AI 生成的冗加说明，仅保留清理后的核心数据。\n\n调优规则：\n1. 完整性：确保所有相关信息完整保留，避免丢失对理解和理解有价值的内容。\n2. 精准性：FAQ 需要密切结合内容，确保清晰，满足且符合用户需求。\n3. 结构化：确保最终输出便于分析存储、同质化处理，并支持高效检索。\n\n数据输入：\n<markdown>{{ $json.result.markdown }}</markdown>\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        1140,
+        -60
+      ],
+      "id": "e12df75a-76a0-44ca-bf58-b1503d12717b",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        160
+      ],
+      "id": "d2278fe8-f5ae-4c6a-b845-07377df3f2d4",
+      "name": "DeepSeek Chat Model",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "dd0QC4fYspYylp1r",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8585d5bd-cd2e-4125-806b-e836f193fb2b",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        920,
+        100
+      ],
+      "id": "72fed1e7-a689-4efc-91ff-3107a7460bf0",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3146c05e-4633-4140-bf64-3fff7b408740",
+              "name": "=task_id",
+              "value": "={{ $('post crawl').item.json.task_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1220,
+        340
+      ],
+      "id": "282ae067-53d1-49e9-8407-d6070b995e29",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "output",
+        "options": {
+          "fileName": "={{ $json.output.split('\\n')[0] }}.md"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1520,
+        40
+      ],
+      "id": "175263c9-aecb-41b3-b26b-12f0b5194e16",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/home/node/{{ new Date().getTime() }}.md",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1740,
+        40
+      ],
+      "id": "c662dd18-c13c-4832-a2a7-e0bed7ce6254",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "content": "sitemap xml获取",
+        "height": 480,
+        "width": 640,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1100,
+        -120
+      ],
+      "typeVersion": 1,
+      "id": "68622045-e5c0-4c80-8b92-3a376bdb2dbb",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "crawl post 抓取数据获取task_id\n",
+        "height": 480,
+        "width": 940
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -480,
+        -120
+      ],
+      "typeVersion": 1,
+      "id": "6ae616c3-f08c-4fc2-9c83-861f111df4fb",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "解析markdown 错误处理 持久化\n",
+        "height": 800,
+        "width": 1680,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        380,
+        -200
+      ],
+      "typeVersion": 1,
+      "id": "539160ce-60d4-4a26-909f-2b5df2bc9d91",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:11235/crawl",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "urls",
+              "value": "={{ $json.loc }}"
+            },
+            {
+              "name": "priority",
+              "value": "10"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        200
+      ],
+      "id": "c41de037-acbc-4dca-8dbf-1f0b1accc5b1",
+      "name": "post crawl",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "VJic2ll6n930Aw5a",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=http://host.docker.internal:11235/task/{{ $json.task_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        100
+      ],
+      "id": "366f37cb-5d3d-4ddb-8e7a-dc810169a315",
+      "name": "get crawl task",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "VJic2ll6n930Aw5a",
+          "name": "Header Auth account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "post crawl",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "get crawl task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "post crawl": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get crawl task": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5afd1e16-d1b5-4483-8b20-4ad896cbaef8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bced8aabd457420111ac7cf217fe3f2f73e96386ff4563bb7e97d32d55b5a78c"
+  },
+  "id": "VWwSBJIdBSpJK4df",
+  "tags": []
+}
