@@ -255,7 +255,7 @@
       "main": [
         [
           {
-            "node": "Merge",
+            "node": "AI Agent",
             "type": "main",
             "index": 0
           }
@@ -266,18 +266,18 @@
       "main": [
         [
           {
-            "node": "Merge",
+            "node": "AI Agent",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ]
       ]
     },
-    "Merge": {
+    "AI Agent": {
       "main": [
         [
           {
-            "node": "AI Agent",
+            "node": "Code",
             "type": "main",
             "index": 0
           }
@@ -295,17 +295,6 @@
         ]
       ]
     },
-    "AI Agent": {
-      "main": [
-        [
-          {
-            "node": "Code",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Code": {
       "main": [
         [
@@ -318,14 +307,15 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "c7718e6c-1148-4d14-a27c-3f0e15158d15",
+  "versionId": "b1b28cf3-f6b5-40a4-9e02-4ea35eaabd02",
   "meta": {
+    "templateCredsSetupCompleted": true,
     "instanceId": "bced8aabd457420111ac7cf217fe3f2f73e96386ff4563bb7e97d32d55b5a78c"
   },
-  "id": "H0wDmPkTBnu4Zak0",
+  "id": "5JBnNXe722yaqd6T",
   "tags": []
 }
